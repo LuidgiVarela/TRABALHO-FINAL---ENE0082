@@ -56,3 +56,4 @@ Linhas representam a classe real e colunas representam a classe predita.
 - `results/transfer_densenet121_modelo/transfer_training_history.csv`
 - `results/comparison_table.csv`
 - `results/comparison_table.md`
+- `notebooks/pessoa2_transfer_learning_resultados.ipynb`
