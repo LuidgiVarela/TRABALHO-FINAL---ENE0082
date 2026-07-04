@@ -54,7 +54,7 @@ def main():
             }
         )
 
-    header = "| Modelo | Acuracia | Precisao | Recall | F1-score |"
+    header = "| Modelo | Acurácia | Precisão | Recall | F1-score |"
     separator = "|---|---:|---:|---:|---:|"
     markdown_lines = [header, separator]
     for row in formatted_rows:

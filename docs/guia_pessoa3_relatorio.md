@@ -23,13 +23,13 @@ O modelo final recomendado para a etapa de Transfer Learning é a **ResNet18 com
 ## Figuras recomendadas para o relatório
 
 - `results/notebook_modelo/dataset_sample_images.png`: exemplos do dataset.
-- `results/notebook_modelo/simple_cnn_confusion_matrix.png`: matriz de confusão da CNN simples.
-- `results/transfer_frozen_modelo/transfer_confusion_matrix.png`: matriz de confusão da ResNet18.
-- `results/transfer_densenet121_modelo/transfer_confusion_matrix.png`: matriz de confusão da DenseNet121.
-- `results/transfer_frozen_modelo/transfer_loss_history.png`: histórico de perda da ResNet18.
-- `results/transfer_frozen_modelo/transfer_metrics_history.png`: histórico de métricas da ResNet18.
-- `results/transfer_densenet121_modelo/transfer_loss_history.png`: histórico de perda da DenseNet121.
-- `results/transfer_densenet121_modelo/transfer_metrics_history.png`: histórico de métricas da DenseNet121.
+- `results/report_figures/cnn_simples_confusion_matrix.png`: matriz de confusão da CNN simples, com título pronto para relatório.
+- `results/report_figures/resnet18_confusion_matrix.png`: matriz de confusão da ResNet18, com título pronto para relatório.
+- `results/report_figures/densenet121_confusion_matrix.png`: matriz de confusão da DenseNet121, com título pronto para relatório.
+- `results/report_figures/resnet18_loss_history.png`: histórico de perda da ResNet18.
+- `results/report_figures/resnet18_metrics_history.png`: histórico de métricas da ResNet18.
+- `results/report_figures/densenet121_loss_history.png`: histórico de perda da DenseNet121.
+- `results/report_figures/densenet121_metrics_history.png`: histórico de métricas da DenseNet121.
 
 ## Texto-base para a metodologia da Pessoa 2
 
