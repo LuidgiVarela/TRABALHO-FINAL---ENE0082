@@ -15,6 +15,7 @@ O modelo final recomendado para a etapa de Transfer Learning é a **ResNet18 com
 ## Arquivos mais importantes
 
 - `notebooks/pessoa2_transfer_learning_resultados.ipynb`: notebook visual com tabela, matrizes de confusão, gráficos e conclusão da Pessoa 2.
+- `docs/pessoa2_transfer_learning_resultados.pdf`: versão em PDF do material técnico da Pessoa 2, pronta para anexar ao envio se o grupo desejar.
 - `docs/resultados_pessoa2.md`: resumo textual dos resultados da Pessoa 2.
 - `docs/pessoa2_metodologia.md`: texto-base da metodologia de Transfer Learning.
 - `results/comparison_table.md`: tabela comparativa em Markdown.
