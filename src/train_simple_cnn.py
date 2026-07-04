@@ -11,7 +11,7 @@ import torch.nn as nn
 import torch.optim as optim
 from tqdm import tqdm
 
-from src.data import build_dataloaders, count_images_by_class
+from src.data import build_custom_split_dataloaders, build_dataloaders, count_images_by_class
 from src.evaluate import compute_metrics, plot_confusion_matrix, predict, save_metrics
 from src.models import build_simple_cnn
 
@@ -131,6 +131,8 @@ def save_run_config(
         "class_weights": (
             dict(zip(class_names, class_weights)) if class_weights is not None else None
         ),
+        "custom_val_split": args.custom_val_split,
+        "val_fraction": args.val_fraction if args.custom_val_split else None,
         "classes": class_names,
         "device": str(device),
     }
@@ -152,6 +154,20 @@ def main():
         action="store_true",
         help="Pondera a loss pelo inverso da frequencia de cada classe no treino.",
     )
+    parser.add_argument(
+        "--custom-val-split",
+        action="store_true",
+        help=(
+            "Junta o train+val oficiais e faz um novo split estratificado "
+            "(o test oficial permanece intocado). Nao afeta o build_dataloaders padrao."
+        ),
+    )
+    parser.add_argument(
+        "--val-fraction",
+        type=float,
+        default=0.1,
+        help="Fracao usada como validacao quando --custom-val-split esta ativo.",
+    )
     args = parser.parse_args()
 
     set_seed(args.seed)
@@ -160,11 +176,20 @@ def main():
     output_dir.mkdir(parents=True, exist_ok=True)
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    datasets_by_split, dataloaders = build_dataloaders(
-        args.data_dir,
-        batch_size=args.batch_size,
-        num_workers=args.num_workers,
-    )
+    if args.custom_val_split:
+        datasets_by_split, dataloaders = build_custom_split_dataloaders(
+            args.data_dir,
+            val_fraction=args.val_fraction,
+            seed=args.seed,
+            batch_size=args.batch_size,
+            num_workers=args.num_workers,
+        )
+    else:
+        datasets_by_split, dataloaders = build_dataloaders(
+            args.data_dir,
+            batch_size=args.batch_size,
+            num_workers=args.num_workers,
+        )
 
     print(f"Dispositivo: {device}")
     print(f"Classes: {datasets_by_split['train'].classes}")

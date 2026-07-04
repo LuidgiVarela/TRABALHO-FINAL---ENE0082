@@ -8,12 +8,7 @@ data/*
 !data/.gitkeep
 
 # Checkpoints de modelos
-*.pt
-*.pth
-*.ckpt
-!results/**/*.pt
-!results/**/*.pth
-!results/**/*.ckpt
+
 
 # Kaggle
 kaggle.json
