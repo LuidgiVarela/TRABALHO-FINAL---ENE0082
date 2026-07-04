@@ -1,9 +1,11 @@
 import argparse
 import csv
 import json
+import random
 from pathlib import Path
 
 import matplotlib.pyplot as plt
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -15,6 +17,14 @@ from src.models import build_simple_cnn
 
 
 MODEL_NAME = "CNN simples"
+
+
+def set_seed(seed: int):
+    """Fixa as sementes de aleatoriedade para tornar o treino reprodutivel."""
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
 
 
 def train_one_epoch(model, dataloader, criterion, optimizer, device):
@@ -94,7 +104,21 @@ def save_training_history(history: list[dict], output_dir: Path):
     return history_path
 
 
-def save_run_config(args, output_dir: Path, class_names: list[str], device: torch.device):
+def compute_class_weights(dataset, class_names: list[str]) -> list[float]:
+    """Peso balanceado por classe: total / (num_classes * amostras_da_classe)."""
+    counts = count_images_by_class(dataset)
+    total = sum(counts.values())
+    num_classes = len(class_names)
+    return [total / (num_classes * counts[class_name]) for class_name in class_names]
+
+
+def save_run_config(
+    args,
+    output_dir: Path,
+    class_names: list[str],
+    device: torch.device,
+    class_weights: list[float] | None,
+):
     config = {
         "model": MODEL_NAME,
         "data_dir": args.data_dir,
@@ -102,6 +126,11 @@ def save_run_config(args, output_dir: Path, class_names: list[str], device: torc
         "batch_size": args.batch_size,
         "learning_rate": args.lr,
         "num_workers": args.num_workers,
+        "seed": args.seed,
+        "class_weighted": args.class_weighted,
+        "class_weights": (
+            dict(zip(class_names, class_weights)) if class_weights is not None else None
+        ),
         "classes": class_names,
         "device": str(device),
     }
@@ -117,7 +146,15 @@ def main():
     parser.add_argument("--batch-size", type=int, default=32)
     parser.add_argument("--lr", type=float, default=1e-3)
     parser.add_argument("--num-workers", type=int, default=0)
+    parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument(
+        "--class-weighted",
+        action="store_true",
+        help="Pondera a loss pelo inverso da frequencia de cada classe no treino.",
+    )
     args = parser.parse_args()
+
+    set_seed(args.seed)
 
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -134,11 +171,22 @@ def main():
     for split, dataset in datasets_by_split.items():
         print(f"{split}: {count_images_by_class(dataset)}")
 
-    save_run_config(args, output_dir, datasets_by_split["train"].classes, device)
+    class_weights = None
+    if args.class_weighted:
+        class_weights = compute_class_weights(
+            datasets_by_split["train"], datasets_by_split["train"].classes
+        )
+        print(f"Pesos de classe (balanceado): {dict(zip(datasets_by_split['train'].classes, class_weights))}")
+
+    save_run_config(args, output_dir, datasets_by_split["train"].classes, device, class_weights)
 
     model = build_simple_cnn(num_classes=len(datasets_by_split["train"].classes)).to(device)
 
-    criterion = nn.CrossEntropyLoss()
+    if class_weights is not None:
+        weight_tensor = torch.tensor(class_weights, dtype=torch.float32).to(device)
+        criterion = nn.CrossEntropyLoss(weight=weight_tensor)
+    else:
+        criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
 
     best_val_f1 = -1.0

@@ -1,0 +1,14 @@
+{
+  "model": "CNN simples",
+  "data_dir": "data/chest_xray",
+  "epochs": 15,
+  "batch_size": 32,
+  "learning_rate": 0.001,
+  "num_workers": 4,
+  "seed": 42,
+  "classes": [
+    "NORMAL",
+    "PNEUMONIA"
+  ],
+  "device": "cuda"
+}
