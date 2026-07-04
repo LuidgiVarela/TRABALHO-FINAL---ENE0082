@@ -187,3 +187,7 @@ Tambem e gerada uma versao em Markdown em `results/comparison_table.md`, util pa
 - `docs/checklist_pessoa2.md`: checklist operacional da sua parte.
 - `docs/resultados_pessoa2.md`: resumo dos resultados finais e comparacao entre modelos.
 - `notebooks/pessoa2_transfer_learning_resultados.ipynb`: notebook leve para relatorio e apresentacao.
+
+## Materiais para a Pessoa 3
+
+- `docs/guia_pessoa3_relatorio.md`: guia de repasse com tabela final, figuras recomendadas, texto-base da metodologia, análise dos resultados e sugestão de estrutura para relatório/slides.
