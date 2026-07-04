@@ -17,6 +17,14 @@ Dataset: [Chest X-Ray Images (Pneumonia)](https://www.kaggle.com/datasets/paulti
 
 Responsavel por baixar e organizar o dataset, criar o carregamento das imagens no PyTorch, aplicar transformacoes basicas e treinar uma CNN simples feita do zero.
 
+Arquivos principais desta parte:
+
+- `src/download_dataset.py`: baixa e organiza o dataset via API do Kaggle.
+- `src/explore_dataset.py`: confere a estrutura de pastas, conta imagens por classe e gera exemplos de radiografias.
+- `src/data.py`: carregamento e pre-processamento reutilizavel (compartilhado com a Pessoa 2).
+- `src/models.py`: define a `SimpleCNN`, treinada do zero.
+- `src/train_simple_cnn.py`: treino e avaliacao da CNN simples.
+
 ### Pessoa 2 - Transfer Learning e comparacao final
 
 Responsavel por treinar um modelo com Transfer Learning, ajustar a ultima camada para duas classes, avaliar o modelo e comparar seus resultados com a CNN simples.
@@ -57,6 +65,41 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
+## Baixar e explorar o dataset
+
+Configure suas credenciais do Kaggle em `~/.kaggle/kaggle.json` (gere o token em https://www.kaggle.com/settings) e rode:
+
+```bash
+python -m src.download_dataset
+```
+
+Isso baixa e organiza o dataset em `data/chest_xray/{train,val,test}/{NORMAL,PNEUMONIA}`.
+
+Para conferir a estrutura de pastas, contar imagens por classe e gerar exemplos de radiografias:
+
+```bash
+python -m src.explore_dataset
+```
+
+Isso gera `results/dataset_class_counts.json` e `results/dataset_sample_images.png`.
+
+## Treinar a CNN simples
+
+```bash
+python -m src.train_simple_cnn --data-dir data/chest_xray --epochs 15 --batch-size 32
+```
+
+O treinamento salva metricas, matriz de confusao e checkpoint em `results/`.
+
+Arquivos gerados pela etapa da CNN simples:
+
+- `results/simple_cnn_metrics.json`: metricas finais no teste.
+- `results/simple_cnn_confusion_matrix.png`: matriz de confusao.
+- `results/simple_cnn_training_history.csv`: historico por epoca.
+- `results/simple_cnn_loss_history.png`: grafico da perda de treino e validacao.
+- `results/simple_cnn_metrics_history.png`: grafico de acuracia e F1-score.
+- `results/simple_cnn_best.pth`: melhor checkpoint pelo F1-score de validacao.
+
 ## Treinar Transfer Learning
 
 ```bash
@@ -76,7 +119,7 @@ Arquivos gerados pela etapa de Transfer Learning:
 
 ## Comparar com a CNN simples
 
-Quando a Pessoa 1 gerar as metricas da CNN simples, salve um arquivo JSON no formato:
+Ao rodar `python -m src.train_simple_cnn`, o arquivo `results/simple_cnn_metrics.json` e gerado automaticamente no formato:
 
 ```json
 {
@@ -99,6 +142,11 @@ python -m src.compare_results --simple-cnn results/simple_cnn_metrics.json --tra
 Isso gera `results/comparison_table.csv`.
 
 Tambem e gerada uma versao em Markdown em `results/comparison_table.md`, util para copiar a tabela para o relatorio.
+
+## Materiais da Pessoa 1
+
+- `docs/pessoa1_metodologia.md`: texto base para a metodologia do dataset e da CNN simples.
+- `docs/checklist_pessoa1.md`: checklist operacional da sua parte.
 
 ## Materiais da Pessoa 2
 

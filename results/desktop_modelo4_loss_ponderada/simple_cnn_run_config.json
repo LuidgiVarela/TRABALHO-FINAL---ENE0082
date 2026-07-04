@@ -1,0 +1,19 @@
+{
+  "model": "CNN simples",
+  "data_dir": "data/chest_xray",
+  "epochs": 30,
+  "batch_size": 32,
+  "learning_rate": 0.001,
+  "num_workers": 4,
+  "seed": 42,
+  "class_weighted": true,
+  "class_weights": {
+    "NORMAL": 1.9448173005219984,
+    "PNEUMONIA": 0.6730322580645162
+  },
+  "classes": [
+    "NORMAL",
+    "PNEUMONIA"
+  ],
+  "device": "cuda"
+}
