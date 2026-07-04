@@ -1,0 +1,16 @@
+{
+  "classes": [
+    "NORMAL",
+    "PNEUMONIA"
+  ],
+  "matrix": [
+    [
+      195,
+      39
+    ],
+    [
+      20,
+      370
+    ]
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "model": "ResNet18 Transfer Learning",
+  "accuracy": 0.905448717948718,
+  "precision": 0.9046454767726161,
+  "recall": 0.9487179487179487,
+  "f1_score": 0.9261576971214017
+}

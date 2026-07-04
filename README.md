@@ -65,6 +65,18 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
+Em maquina com GPU NVIDIA, confira se o PyTorch instalado reconhece CUDA:
+
+```bash
+python -c "import torch; print(torch.__version__); print(torch.cuda.is_available())"
+```
+
+Se aparecer `False`, instale a build CUDA do PyTorch:
+
+```bash
+pip install --force-reinstall torch torchvision --index-url https://download.pytorch.org/whl/cu128
+```
+
 ## Baixar e explorar o dataset
 
 Configure suas credenciais do Kaggle em `~/.kaggle/kaggle.json` (gere o token em https://www.kaggle.com/settings) e rode:
@@ -106,6 +118,12 @@ Arquivos gerados pela etapa da CNN simples:
 python -m src.train_transfer --data-dir data/chest_xray --epochs 10 --batch-size 32
 ```
 
+Configuracao final usada pela Pessoa 2:
+
+```bash
+python -m src.train_transfer --data-dir data/chest_xray --output-dir results/transfer_frozen_modelo --epochs 10 --batch-size 32 --lr 0.001 --freeze-backbone
+```
+
 O treinamento salva metricas, matriz de confusao e checkpoint em `results/`.
 
 Arquivos gerados pela etapa de Transfer Learning:
@@ -116,6 +134,8 @@ Arquivos gerados pela etapa de Transfer Learning:
 - `results/transfer_loss_history.png`: grafico da perda de treino e validacao.
 - `results/transfer_metrics_history.png`: grafico de acuracia e F1-score.
 - `results/resnet18_transfer_best.pth`: melhor checkpoint pelo F1-score de validacao.
+
+Os resultados finais da Pessoa 2 estao resumidos em `docs/resultados_pessoa2.md`.
 
 ## Comparar com a CNN simples
 

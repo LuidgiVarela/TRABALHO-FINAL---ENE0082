@@ -6,6 +6,7 @@ __pycache__/
 # Dados e artefatos grandes
 data/*
 !data/.gitkeep
+archive.zip
 
 # Checkpoints de modelos
 *.pt
@@ -14,6 +15,10 @@ data/*
 !results/**/*.pt
 !results/**/*.pth
 !results/**/*.ckpt
+
+# Saidas locais auxiliares
+results/dataset_check/
+results/transfer_modelo/
 
 # Kaggle
 kaggle.json
