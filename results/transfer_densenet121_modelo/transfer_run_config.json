@@ -1,0 +1,15 @@
+{
+  "model": "DenseNet121 Transfer Learning",
+  "backbone": "densenet121",
+  "data_dir": "data\\chest_xray",
+  "epochs": 10,
+  "batch_size": 32,
+  "learning_rate": 0.001,
+  "num_workers": 0,
+  "freeze_backbone": true,
+  "classes": [
+    "NORMAL",
+    "PNEUMONIA"
+  ],
+  "device": "cuda"
+}

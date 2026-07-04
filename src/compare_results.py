@@ -22,11 +22,18 @@ def main():
     parser = argparse.ArgumentParser(description="Compara CNN simples e Transfer Learning.")
     parser.add_argument("--simple-cnn", required=True, help="JSON com metricas da CNN simples.")
     parser.add_argument("--transfer", default="results/transfer_metrics.json")
+    parser.add_argument(
+        "--extra-metrics",
+        nargs="*",
+        default=[],
+        help="Arquivos JSON adicionais de metricas para incluir na tabela.",
+    )
     parser.add_argument("--output", default="results/comparison_table.csv")
     parser.add_argument("--markdown-output", default="results/comparison_table.md")
     args = parser.parse_args()
 
-    rows = [load_metrics(args.simple_cnn), load_metrics(args.transfer)]
+    metric_paths = [args.simple_cnn, args.transfer, *args.extra_metrics]
+    rows = [load_metrics(path) for path in metric_paths]
 
     output_path = Path(args.output)
     output_path.parent.mkdir(parents=True, exist_ok=True)

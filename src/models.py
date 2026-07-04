@@ -52,3 +52,35 @@ def build_resnet18(num_classes: int = 2, freeze_backbone: bool = False):
     in_features = model.fc.in_features
     model.fc = nn.Linear(in_features, num_classes)
     return model
+
+
+def build_densenet121(num_classes: int = 2, freeze_backbone: bool = False):
+    weights = models.DenseNet121_Weights.DEFAULT
+    model = models.densenet121(weights=weights)
+
+    if freeze_backbone:
+        for parameter in model.parameters():
+            parameter.requires_grad = False
+
+    in_features = model.classifier.in_features
+    model.classifier = nn.Linear(in_features, num_classes)
+    return model
+
+
+def build_transfer_model(
+    model_name: str,
+    num_classes: int = 2,
+    freeze_backbone: bool = False,
+):
+    builders = {
+        "resnet18": build_resnet18,
+        "densenet121": build_densenet121,
+    }
+    if model_name not in builders:
+        available = ", ".join(sorted(builders))
+        raise ValueError(f"Modelo desconhecido: {model_name}. Opcoes: {available}")
+
+    return builders[model_name](
+        num_classes=num_classes,
+        freeze_backbone=freeze_backbone,
+    )

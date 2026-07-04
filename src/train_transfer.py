@@ -11,10 +11,13 @@ from tqdm import tqdm
 
 from src.data import build_dataloaders, count_images_by_class
 from src.evaluate import compute_metrics, plot_confusion_matrix, predict, save_metrics
-from src.models import build_resnet18
+from src.models import build_transfer_model
 
 
-MODEL_NAME = "ResNet18 Transfer Learning"
+MODEL_DISPLAY_NAMES = {
+    "resnet18": "ResNet18 Transfer Learning",
+    "densenet121": "DenseNet121 Transfer Learning",
+}
 
 
 def train_one_epoch(model, dataloader, criterion, optimizer, device):
@@ -60,7 +63,7 @@ def evaluate_loss_accuracy(model, dataloader, criterion, device):
     return running_loss / total, correct / total
 
 
-def save_training_history(history: list[dict], output_dir: Path):
+def save_training_history(history: list[dict], output_dir: Path, title_suffix: str = "Transfer Learning"):
     history_path = output_dir / "transfer_training_history.csv"
     with history_path.open("w", encoding="utf-8", newline="") as file:
         writer = csv.DictWriter(file, fieldnames=history[0].keys())
@@ -73,7 +76,7 @@ def save_training_history(history: list[dict], output_dir: Path):
     plt.plot(epochs, [row["val_loss"] for row in history], label="Loss validacao")
     plt.xlabel("Epoca")
     plt.ylabel("Loss")
-    plt.title("Historico de perda - Transfer Learning")
+    plt.title(f"Historico de perda - {title_suffix}")
     plt.legend()
     plt.tight_layout()
     plt.savefig(output_dir / "transfer_loss_history.png", dpi=150)
@@ -85,7 +88,7 @@ def save_training_history(history: list[dict], output_dir: Path):
     plt.plot(epochs, [row["val_f1_score"] for row in history], label="F1 validacao")
     plt.xlabel("Epoca")
     plt.ylabel("Metrica")
-    plt.title("Historico de metricas - Transfer Learning")
+    plt.title(f"Historico de metricas - {title_suffix}")
     plt.legend()
     plt.tight_layout()
     plt.savefig(output_dir / "transfer_metrics_history.png", dpi=150)
@@ -96,7 +99,8 @@ def save_training_history(history: list[dict], output_dir: Path):
 
 def save_run_config(args, output_dir: Path, class_names: list[str], device: torch.device):
     config = {
-        "model": MODEL_NAME,
+        "model": MODEL_DISPLAY_NAMES[args.model],
+        "backbone": args.model,
         "data_dir": args.data_dir,
         "epochs": args.epochs,
         "batch_size": args.batch_size,
@@ -111,9 +115,15 @@ def save_run_config(args, output_dir: Path, class_names: list[str], device: torc
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Treina ResNet18 com Transfer Learning.")
+    parser = argparse.ArgumentParser(description="Treina modelo com Transfer Learning.")
     parser.add_argument("--data-dir", default="data/chest_xray")
     parser.add_argument("--output-dir", default="results")
+    parser.add_argument(
+        "--model",
+        choices=sorted(MODEL_DISPLAY_NAMES),
+        default="resnet18",
+        help="Backbone pre-treinado usado no Transfer Learning.",
+    )
     parser.add_argument("--epochs", type=int, default=10)
     parser.add_argument("--batch-size", type=int, default=32)
     parser.add_argument("--lr", type=float, default=1e-4)
@@ -138,7 +148,9 @@ def main():
 
     save_run_config(args, output_dir, datasets_by_split["train"].classes, device)
 
-    model = build_resnet18(
+    model_display_name = MODEL_DISPLAY_NAMES[args.model]
+    model = build_transfer_model(
+        args.model,
         num_classes=len(datasets_by_split["train"].classes),
         freeze_backbone=args.freeze_backbone,
     ).to(device)
@@ -150,7 +162,7 @@ def main():
     )
 
     best_val_f1 = -1.0
-    best_checkpoint = output_dir / "resnet18_transfer_best.pth"
+    best_checkpoint = output_dir / f"{args.model}_transfer_best.pth"
     history = []
 
     for epoch in range(1, args.epochs + 1):
@@ -161,7 +173,7 @@ def main():
             model, dataloaders["val"], criterion, device
         )
         val_true, val_pred = predict(model, dataloaders["val"], device)
-        val_metrics = compute_metrics(val_true, val_pred, model_name=MODEL_NAME)
+        val_metrics = compute_metrics(val_true, val_pred, model_name=model_display_name)
         history.append(
             {
                 "epoch": epoch,
@@ -185,13 +197,13 @@ def main():
             best_val_f1 = val_metrics["f1_score"]
             torch.save(model.state_dict(), best_checkpoint)
 
-    history_path = save_training_history(history, output_dir)
+    history_path = save_training_history(history, output_dir, title_suffix=model_display_name)
     model.load_state_dict(torch.load(best_checkpoint, map_location=device))
     test_true, test_pred = predict(model, dataloaders["test"], device)
     test_metrics = compute_metrics(
         test_true,
         test_pred,
-        model_name=MODEL_NAME,
+        model_name=model_display_name,
     )
 
     save_metrics(test_metrics, output_dir / "transfer_metrics.json")

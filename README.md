@@ -31,7 +31,7 @@ Responsavel por treinar um modelo com Transfer Learning, ajustar a ultima camada
 
 Arquivos principais desta parte:
 
-- `src/train_transfer.py`: treino da ResNet18 com Transfer Learning.
+- `src/train_transfer.py`: treino de modelos com Transfer Learning, incluindo ResNet18 e DenseNet121.
 - `src/data.py`: carregamento e pre-processamento reutilizavel.
 - `src/evaluate.py`: metricas e matriz de confusao.
 - `src/compare_results.py`: tabela comparativa entre CNN simples e Transfer Learning.
@@ -121,7 +121,13 @@ python -m src.train_transfer --data-dir data/chest_xray --epochs 10 --batch-size
 Configuracao final usada pela Pessoa 2:
 
 ```bash
-python -m src.train_transfer --data-dir data/chest_xray --output-dir results/transfer_frozen_modelo --epochs 10 --batch-size 32 --lr 0.001 --freeze-backbone
+python -m src.train_transfer --data-dir data/chest_xray --output-dir results/transfer_frozen_modelo --model resnet18 --epochs 10 --batch-size 32 --lr 0.001 --freeze-backbone
+```
+
+Experimento adicional com DenseNet121:
+
+```bash
+python -m src.train_transfer --data-dir data/chest_xray --output-dir results/transfer_densenet121_modelo --model densenet121 --epochs 10 --batch-size 32 --lr 0.001 --freeze-backbone
 ```
 
 O treinamento salva metricas, matriz de confusao e checkpoint em `results/`.
@@ -133,7 +139,7 @@ Arquivos gerados pela etapa de Transfer Learning:
 - `results/transfer_training_history.csv`: historico por epoca.
 - `results/transfer_loss_history.png`: grafico da perda de treino e validacao.
 - `results/transfer_metrics_history.png`: grafico de acuracia e F1-score.
-- `results/resnet18_transfer_best.pth`: melhor checkpoint pelo F1-score de validacao.
+- `results/<modelo>_transfer_best.pth`: melhor checkpoint pelo F1-score de validacao.
 
 Os resultados finais da Pessoa 2 estao resumidos em `docs/resultados_pessoa2.md`.
 
@@ -157,6 +163,12 @@ Depois execute:
 
 ```bash
 python -m src.compare_results --simple-cnn results/simple_cnn_metrics.json --transfer results/transfer_metrics.json
+```
+
+Para incluir modelos adicionais na mesma tabela:
+
+```bash
+python -m src.compare_results --simple-cnn results/notebook_modelo/simple_cnn_metrics.json --transfer results/transfer_frozen_modelo/transfer_metrics.json --extra-metrics results/transfer_densenet121_modelo/transfer_metrics.json
 ```
 
 Isso gera `results/comparison_table.csv`.
